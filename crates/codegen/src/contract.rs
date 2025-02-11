@@ -1222,7 +1222,7 @@ impl Contract {
 
             let path_seg = &type_path.path.segments[0];
             let name = path_seg.ident.to_string();
-            if name == "u64" || name == "u128" || name == "Uint256" || name == "f64" || name == "Float128" {
+            if name == "u64" || name == "u128" || name == "Uint256" || name == "f64" || name == "Float128" || name == "Name" || name == "Checksum256" {
                 return true;
             } else {
                 return false;
@@ -1249,6 +1249,10 @@ impl Contract {
                 return Some("IdxF64");
             } else if name == "Float128" {
                 return Some("IdxF128");
+            } else if name == "Name" {
+                return Some("Idx64");
+            } else if name == "Checksum256" {
+                return Some("Idx256");
             } else {
                 return None;
             }

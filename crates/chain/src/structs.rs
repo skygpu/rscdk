@@ -126,7 +126,16 @@ impl Checksum256 {
         let data = decode_hex(s);
         let mut ret = Self::default();
         slice_copy(&mut ret.data, &data);
-        return ret;
+        ret
+    }
+
+    pub fn from_u128s(lo: u128, hi: u128) -> Self {
+        let lo_bytes: [u8; 16] = lo.to_le_bytes().try_into().unwrap();
+        let hi_bytes: [u8; 16] = hi.to_le_bytes().try_into().unwrap();
+        let mut ret = Self::default();
+        ret.data[..16].copy_from_slice(&lo_bytes);
+        ret.data[16..].copy_from_slice(&hi_bytes);
+        ret
     }
 }
 
@@ -146,6 +155,12 @@ impl Packer for Checksum256 {
         check(raw.len() >= size, "Checksum256.unpack: buffer overflow!");
         slice_copy(&mut self.data, &raw[..size]);
         return self.size();
+    }
+}
+
+impl Printable for Checksum256 {
+    fn print(&self) {
+        crate::vmapi::print::printhex(self.data.as_ptr() as *mut u8, 32);
     }
 }
 

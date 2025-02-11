@@ -22,9 +22,7 @@ use crate::serializer::{
 
 use crate::asset::Asset;
 
-use crate::{
-    check,
-};
+use crate::{check, Checksum256};
 
 use crate::print::{
     Printable
@@ -258,6 +256,12 @@ impl From<u64> for SecondaryValue {
     }
 }
 
+impl From<Name> for SecondaryValue {
+    fn from(value: Name) -> Self {
+        SecondaryValue::Idx64(value.n)
+    }
+}
+
 impl From<u128> for SecondaryValue {
     fn from(value: u128) -> Self {
         SecondaryValue::Idx128(value)
@@ -267,6 +271,16 @@ impl From<u128> for SecondaryValue {
 impl From<Uint256> for SecondaryValue {
     fn from(value: Uint256) -> Self {
         SecondaryValue::Idx256(value)
+    }
+}
+
+impl From<Checksum256> for SecondaryValue {
+    fn from(value: Checksum256) -> Self {
+        let lo_bytes: [u8; 16] = value.data[..16].try_into().unwrap();
+        let hi_bytes: [u8; 16] = value.data[16..32].try_into().unwrap();
+        let hi = u128::from_le_bytes(hi_bytes).try_into().unwrap();
+        let lo = u128::from_le_bytes(lo_bytes).try_into().unwrap();
+        SecondaryValue::Idx256(Uint256::new(lo, hi))
     }
 }
 
@@ -293,6 +307,17 @@ impl From<SecondaryValue> for u64 {
     }
 }
 
+impl From<SecondaryValue> for Name {
+    fn from(value: SecondaryValue) -> Self {
+        if let SecondaryValue::Idx64(x) = value {
+            Name::from_u64(x)
+        } else {
+            check(false, "From<SecondaryValue> for Name: Invalid SecondaryValue");
+            Default::default()
+        }
+    }
+}
+
 impl From<SecondaryValue> for u128 {
     fn from(value: SecondaryValue) -> Self {
         if let SecondaryValue::Idx128(x) = value {
@@ -308,6 +333,17 @@ impl From<SecondaryValue> for Uint256 {
     fn from(value: SecondaryValue) -> Self {
         if let SecondaryValue::Idx256(x) = value {
             x
+        } else {
+            check(false, "From<SecondaryValue> for Uint256: Invalid SecondaryValue");
+            Default::default()
+        }
+    }
+}
+
+impl From<SecondaryValue> for Checksum256 {
+    fn from(value: SecondaryValue) -> Self {
+        if let SecondaryValue::Idx256(x) = value {
+            Checksum256::from_u128s(x.data[0], x.data[1])
         } else {
             check(false, "From<SecondaryValue> for Uint256: Invalid SecondaryValue");
             Default::default()
