@@ -22,7 +22,7 @@ use crate::serializer::{
 
 use crate::asset::Asset;
 
-use crate::{check, Checksum256};
+use crate::{check, Checksum256, TimePointSec};
 
 use crate::print::{
     Printable
@@ -262,6 +262,12 @@ impl From<Name> for SecondaryValue {
     }
 }
 
+impl From<TimePointSec> for SecondaryValue {
+    fn from(value: TimePointSec) -> Self {
+        SecondaryValue::Idx64(value.seconds as u64)
+    }
+}
+
 impl From<u128> for SecondaryValue {
     fn from(value: u128) -> Self {
         SecondaryValue::Idx128(value)
@@ -302,6 +308,17 @@ impl From<SecondaryValue> for u64 {
             x
         } else {
             check(false, "From<SecondaryValue> for u64: Invalid SecondaryValue");
+            Default::default()
+        }
+    }
+}
+
+impl From<SecondaryValue> for TimePointSec {
+    fn from(value: SecondaryValue) -> Self {
+        if let SecondaryValue::Idx64(x) = value {
+            TimePointSec::new(x as u32)
+        } else {
+            check(false, "From<SecondaryValue> for TimePointSec: Invalid SecondaryValue");
             Default::default()
         }
     }

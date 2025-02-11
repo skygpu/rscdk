@@ -641,6 +641,12 @@ impl Packer for TimePointSec {
     }
 }
 
+impl Printable for TimePointSec {
+    fn print(&self) {
+        crate::vmapi::print::printui(self.seconds as u64);
+    }
+}
+
 ///
 #[cfg_attr(feature = "std", derive(eosio_scale_info::TypeInfo))]
 #[derive(Copy, Clone, Default)]
