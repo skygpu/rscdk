@@ -1,6 +1,4 @@
-use crate::utils::{
-    decode_hex,
-};
+use crate::utils::{decode_hex, unix_timestamp_to_iso8601};
 
 use crate::vmapi::eosio::{
     slice_copy,
@@ -623,7 +621,11 @@ impl TimePointSec {
     }
 
     pub fn seconds(&self) -> u32 {
-        return self.seconds;
+        self.seconds
+    }
+
+    pub fn to_iso_string(&self) -> String {
+        unix_timestamp_to_iso8601(self.seconds as u64)
     }
 }
 
@@ -644,7 +646,8 @@ impl Packer for TimePointSec {
 
 impl Printable for TimePointSec {
     fn print(&self) {
-        crate::vmapi::print::printui(self.seconds as u64);
+        let iso = self.to_iso_string();
+        crate::vmapi::print::prints(iso.as_ptr());
     }
 }
 

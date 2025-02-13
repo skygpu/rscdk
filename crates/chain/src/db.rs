@@ -935,7 +935,7 @@ impl IdxTable for Idx256Table {
     }
 
     fn find(&self, secondary: SecondaryValue) -> SecondaryIterator {
-        if let SecondaryValue::Idx256(mut value) = secondary {
+        if let SecondaryValue::Idx256(value) = secondary {
             let mut primary = 0;
             let ret = db_idx256_find_secondary(self.code, self.scope, self.table, value.to_big_endian().data.as_mut_ptr() as *mut Uint128, 2, &mut primary);
             return SecondaryIterator{ i: ret, primary: primary, db_index: self.db_index };
@@ -945,7 +945,7 @@ impl IdxTable for Idx256Table {
     }
 
     fn lower_bound(&self, secondary: SecondaryValue) -> (SecondaryIterator, SecondaryValue) {
-        if let SecondaryValue::Idx256(mut value) = secondary {
+        if let SecondaryValue::Idx256(value) = secondary {
             let mut primary = 0;
             let ret = db_idx256_lowerbound(self.code, self.scope, self.table, value.to_big_endian().data.as_mut_ptr() as *mut u8 as *mut Uint128, 2, &mut primary);
             if ret >= 0 {
@@ -960,7 +960,7 @@ impl IdxTable for Idx256Table {
 
     fn upper_bound(&self, secondary: SecondaryValue) -> (SecondaryIterator, SecondaryValue) {
         match secondary {
-            SecondaryValue::Idx256(mut value) => {
+            SecondaryValue::Idx256(value) => {
                 let mut primary = 0;
                 let ret = db_idx256_upperbound(self.code, self.scope, self.table, value.to_big_endian().data.as_mut_ptr() as *mut u8 as *mut Uint128, 2, &mut primary);
                 if ret >= 0 {

@@ -976,6 +976,13 @@ impl Contract {
                                 self.mi.store(value, payer);
                             }
                         }
+
+                        fn clear(&self) {
+                            let it = self.mi.find(rust_chain::Name::new(#table_name).value());
+                            if it.is_ok() {
+                                self.mi.remove(&it);
+                            }
+                        }
                     }
 
                     impl #table_ident {
@@ -986,7 +993,7 @@ impl Contract {
 
                         #[allow(dead_code)]
                         fn new_table(code: rust_chain::Name) -> Box<#mi_ident> {
-                            #table_ident::new_table_with_scope(code, rust_chain::Name{n: 0})
+                            #table_ident::new_table_with_scope(code, code)
                         }
                     }
                 );
@@ -1017,6 +1024,15 @@ impl Contract {
                 
                     pub fn remove(&self, iterator: &::rust_chain::db::Iterator<#table_ident>) {
                         return self.mi.remove(iterator);
+                    }
+
+                    pub fn clear(&self) {
+                        let mut it = self.mi.lower_bound(0);
+                        while it.is_ok() {
+                            let next_it = self.mi.next(&it);
+                            self.mi.remove(&it);
+                            it = next_it;
+                        }
                     }
                 
                     pub fn get(&self, iterator: &::rust_chain::db::Iterator<#table_ident>) -> Option<#table_ident> {
@@ -1071,7 +1087,7 @@ impl Contract {
 
                     #[allow(dead_code)]
                     fn new_table(code: rust_chain::Name) -> Box<#mi_ident> {
-                        #table_ident::new_table_with_scope(code, rust_chain::Name{n: 0})
+                        #table_ident::new_table_with_scope(code, code)
                     }
                 }
             );
