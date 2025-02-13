@@ -25,10 +25,7 @@ use crate::varint::{
     VarUint32,
 };
 
-use crate::{
-    vec::Vec,
-    string::String,
-};
+use crate::{vec::Vec, string::String, current_time};
 
 ///
 #[repr(C, align(8))]
@@ -619,6 +616,10 @@ pub struct TimePointSec {
 impl TimePointSec {
     pub fn new(seconds: u32) -> Self{
         Self{ seconds }
+    }
+
+    pub fn current() -> Self {
+        TimePointSec::new((current_time().elapsed / 1000000) as u32)
     }
 
     pub fn seconds(&self) -> u32 {
